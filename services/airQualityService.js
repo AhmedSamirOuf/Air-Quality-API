@@ -8,6 +8,7 @@ const getAirQualityByGIS = async (latitude, longitude, apiKey) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching air quality:', error);
+        error.message = "Failed to fetch"
         throw error;
     }
 }

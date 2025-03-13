@@ -1,5 +1,5 @@
 const AirQuality = require("../models/airQuality");
-
+const Pollution = require("../models/airQuality");
 const saveAirQualityData = async (pollutionData, latitude, longitude) => {
     const savedData = {
         latitude: latitude,
@@ -20,14 +20,31 @@ const saveAirQualityData = async (pollutionData, latitude, longitude) => {
     }catch(err) {
         if (err.name === 'ValidationError') {
             console.error('Validation error saving air quality data:', err.message);
-            throw new Error(`Validation error: ${err}`);
+            throw new Error(`Failed to save ${err}`);
         } else {
             console.error('Error saving air quality data:', err);
+            err.message = 'Failed to save'
             throw err;
         }
     }
 
 }
+
+const getMaxPollutionDatetime = async (req, res) => {
+    try {
+        const result = await Pollution.aggregate([
+            { $sort: { 'pollution.aqius': -1 } },
+            { $limit: 1 },
+            { $project: { _id: 0, timestamp: 1 } }
+        ]);
+        return result.length > 0 ? result[0].timestamp : 0;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error
+    }
+}
+
 module.exports = {
-    saveAirQualityData
+    saveAirQualityData,
+    getMaxPollutionDatetime
 };

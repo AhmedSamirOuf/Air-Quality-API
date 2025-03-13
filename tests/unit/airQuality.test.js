@@ -1,10 +1,10 @@
 const express = require('express');
-const airQualityController = require('../controllers/airQualityController');
-const airQualityService = require('../services/airQualityService');
-const databaseService = require('../services/databaseService');
+const airQualityController = require('../../controllers/airQualityController');
+const airQualityService = require('../../services/airQualityService');
+const databaseService = require('../../services/databaseService');
 
-jest.mock('../services/airQualityService');
-jest.mock('../services/databaseService');
+jest.mock('../../services/airQualityService');
+jest.mock('../../services/databaseService');
 
 const app = express();
 app.use(express.json());
@@ -55,7 +55,7 @@ describe('test air quality controller', () => {
         await airQualityController.getNearestCityAirQuality(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith('Internal server error.');
+        expect(res.json).toHaveBeenCalledWith({"message": "Internal server error."});
 
     });
 
@@ -93,8 +93,11 @@ describe('test air quality controller', () => {
 
         await airQualityController.getNearestCityAirQuality(req, res);
 
-        expect(res.status).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith(ExpectedAirQualityData);
+
+    });
+    it('should return max polluted datetime in paris', () => {
 
     });
 });
