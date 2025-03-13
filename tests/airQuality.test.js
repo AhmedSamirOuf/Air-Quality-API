@@ -1,8 +1,10 @@
 const express = require('express');
 const airQualityController = require('../controllers/airQualityController');
 const airQualityService = require('../services/airQualityService');
+const databaseService = require('../services/databaseService');
 
 jest.mock('../services/airQualityService');
+jest.mock('../services/databaseService');
 
 const app = express();
 app.use(express.json());
@@ -30,6 +32,13 @@ describe('test air quality controller', () => {
         };
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterAll(() => {
+        jest.restoreAllMocks();
+    });
 
     it('should return 400 if latitude or longitude is missing', async () => {
         req.query.latitude = latitude;
@@ -75,9 +84,12 @@ describe('test air quality controller', () => {
                 }
             }
         };
+
         req.query.latitude = latitude;
         req.query.longitude = longitude;
+
         airQualityService.getAirQualityByGIS.mockResolvedValue(mockAirQualityData);
+        databaseService.saveAirQualityData.mockResolvedValue(mockAirQualityData);
 
         await airQualityController.getNearestCityAirQuality(req, res);
 
